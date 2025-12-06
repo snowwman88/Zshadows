@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZShadows • Access Portal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      height: 100vh;
+      background: #000;
+      color: #00ffbf;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* MATRIX BACKGROUND */
+    #matrix {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* Auth Box */
+    .auth-box {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      padding: 32px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid #00ffbf;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.3);
+      backdrop-filter: blur(6px);
+      animation: slideDown 1.2s ease;
+    }
+
+    @keyframes slideDown {
+      0% { transform: translateY(-40px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .title {
+      text-align: center;
+      font-size: 1.9em;
+      margin-bottom: 22px;
+      text-shadow: 0 0 12px #00ffbf;
+    }
+
+    .input-box { margin-bottom: 20px; }
+
+    .input-box label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.9em;
+      letter-spacing: 1px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 10px;
+      background: #000;
+      border: 1px solid #00ffbf;
+      color: #00ffbf;
+      border-radius: 6px;
+      font-size: 1em;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .input-box input:focus {
+      box-shadow: 0 0 12px #00ffbf;
+      border-color: #00ffe0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid #00ffbf;
+      border-radius: 8px;
+      color: #00ffbf;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #00ffbf;
+      color: #000;
+      box-shadow: 0 0 20px #00ffbf;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9em;
+    }
+
+    .link a {
+      color: #00ffbf;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .link a:hover { text-shadow: 0 0 10px #00ffbf; }
+
+    /* SIGNUP HIDDEN */
+    #signup-page { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Matrix Canvas Background -->
+<canvas id="matrix"></canvas>
+
+<!-- LOGIN PAGE -->
+<div class="auth-box" id="login-page">
+  <div class="title">ZShadows • Secure Login</div>
+
+  <div class="input-box">
+    <label>Username</label>
+    <input type="text" id="login-user" placeholder="Enter ID">
+  </div>
+
+  <div class="input-box">
+    <label>Password</label>
+    <input type="password" id="login-pass" placeholder="Enter Key">
+  </div>
+
+  <button class="btn" onclick="login()">LOGIN</button>
+
+  <div class="link">
+    No account? <a href="#" onclick="showSignup()">Sign up</a>
+  </div>
+</div>
+
+<!-- SIGNUP PAGE -->
+<div class="auth-box" id="signup-page">
+  <div class="title">ZShadows • Create Account</div>
+
+  <div class="input-box">
+    <label>Create Username</label>
+    <input type="text" id="signup-user" placeholder="Choose ID">
+  </div>
+
+  <div class="input-box">
+    <label>Create Password</label>
+    <input type="password" id="signup-pass" placeholder="Choose Password">
+  </div>
+
+  <div class="input-box">
+    <label>Confirm Password</label>
+    <input type="password" id="signup-pass2" placeholder="Retype Password">
+  </div>
+
+  <button class="btn" onclick="signup()">CREATE ACCOUNT</button>
+
+  <div class="link">
+    Already have account? <a href="#" onclick="showLogin()">Login</a>
+  </div>
+</div>
+
+<script>
+/* MATRIX EFFECT */
+const c = document.getElementById('matrix');
+const ctx = c.getContext('2d');
+c.height = window.innerHeight;
+c.width = window.innerWidth;
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const fontSize = 16;
+const columns = c.width / fontSize;
+let drops = [];
+
+for (let x = 0; x < columns; x++) drops[x] = 1;
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = '#00ffbf';
+  ctx.font = fontSize + 'px monospace';
+
+  for (let i = 0; i < drops.length; i++) {
+    const txt = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(txt, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix, 40);
+
+/* PAGE SWITCH */
+function showSignup() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('signup-page').style.display = 'block';
+}
+
+function showLogin() {
+  document.getElementById('signup-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'block';
+}
+
+/* LOGIN FUNCTION */
+function login() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+
+  if (u === '' || p === '') {
+    alert('Enter valid access credentials');
+    return;
+  }
+
+  window.location.href = 'https://photos.google.com';
+}
+
+/* SIGNUP FUNCTION */
+function signup() {
+  const u = document.getElementById('signup-user').value.trim();
+  const p1 = document.getElementById('signup-pass').value.trim();
+  const p2 = document.getElementById('signup-pass2').value.trim();
+
+  if (u === '' || p1 === '' || p2 === '') {
+    alert('All fields required');
+    return;
+  }
+  if (p1 !== p2) {
+    alert('Passwords do not match');
+    return;
+  }
+
+  alert('Account created successfully! Now login.');
+  showLogin();
+}
+</script>
+
+</body>
+</html>
